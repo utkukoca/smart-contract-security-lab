@@ -25,9 +25,16 @@ contract BaseVaultTest is Test {
     }
     function test_FirstDepositorGetsSharesEqualToAmount() external {
         vm.startPrank(USER);
-        mockToken.approve(address(baseVault), type(uint256).max);
+        mockToken.approve(address(baseVault), type(uint256).max); //we have to use approve in this section if we use in BaseVault we approve to user can use token which in BaseVault
         baseVault.deposit(FIRST_AMOUNT);
         assertEq(FIRST_AMOUNT, baseVault.balanceOf(USER));
+        vm.stopPrank();
+    }
+    function test_VaultBalanceIncreasesAfterDeposit() external {
+        vm.startPrank(USER);
+        mockToken.approve(address(baseVault), type(uint256).max); //we have to use approve in this section if we use in BaseVault we approve to user can use token which in BaseVault
+        baseVault.deposit(FIRST_AMOUNT);
+        assertEq(FIRST_AMOUNT, mockToken.balanceOf(address(baseVault)));
         vm.stopPrank();
     }
 }
