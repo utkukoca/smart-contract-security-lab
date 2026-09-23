@@ -8,10 +8,13 @@ import {Test, console} from "forge-std/Test.sol";
 contract BaseVaultTest is Test {
     BaseVault public baseVault;
     MockToken public mockToken;
+    address public USER = makeAddr("user"); //test address
+    uint256 public constant FIRST_AMOUNT = 100;
 
     function setUp() external {
         mockToken = new MockToken();
         baseVault = new BaseVault(mockToken);
+        mockToken.mint(USER, 1000 * 10 ** 18); //mint mock money for USER
     }
 
     function testEqTokenAddress() external view {
@@ -19,5 +22,12 @@ contract BaseVaultTest is Test {
     }
     function testVaultBegining() external view {
         assertEq(baseVault.totalShares(), 0);
+    }
+    function test_FirstDepositorGetsSharesEqualToAmount() external {
+        vm.startPrank(USER);
+        mockToken.approve(address(baseVault), type(uint256).max);
+        baseVault.deposit(FIRST_AMOUNT);
+        assertEq(FIRST_AMOUNT, baseVault.balanceOf(USER));
+        vm.stopPrank();
     }
 }
