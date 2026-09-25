@@ -42,16 +42,17 @@ contract BaseVault {
     function withdraw(uint256 _shareAmount) public returns (uint256) {
         if (_shareAmount == 0) {
             revert BaseVault__ZeroAmount();
-        }
-        if (_shareAmount <= balanceOf[msg.sender]) {
-            uint256 tokenWithdrawAmount = (_shareAmount *
-                asset.balanceOf(address(this))) / totalShares;
-            balanceOf[msg.sender] -= _shareAmount;
-            totalShares -= _shareAmount;
-            asset.transfer(msg.sender, tokenWithdrawAmount);
-            return (tokenWithdrawAmount);
         } else {
-            revert BaseVault__WithdrawAmountIsMoreThanCurrentShare();
+            if (_shareAmount <= balanceOf[msg.sender]) {
+                uint256 tokenWithdrawAmount = (_shareAmount *
+                    asset.balanceOf(address(this))) / totalShares;
+                balanceOf[msg.sender] -= _shareAmount;
+                totalShares -= _shareAmount;
+                asset.transfer(msg.sender, tokenWithdrawAmount);
+                return (tokenWithdrawAmount);
+            } else {
+                revert BaseVault__WithdrawAmountIsMoreThanCurrentShare();
+            }
         }
     }
 }

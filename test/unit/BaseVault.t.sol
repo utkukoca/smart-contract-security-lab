@@ -132,4 +132,34 @@ contract BaseVaultTest is VaultTestBase {
             mockToken.balanceOf(USER)
         );
     }
+
+    function test_Withdraw_ZeroAmount() external {
+        vm.startPrank(USER);
+        baseVault.deposit(FIRST_AMOUNT);
+        vm.expectRevert(BaseVault.BaseVault__ZeroAmount.selector);
+        baseVault.withdraw(0);
+        vm.stopPrank();
+    }
+    function test_Withdraw_MoreThan_HavingOne() external {
+        vm.startPrank(USER);
+        baseVault.deposit(FIRST_AMOUNT);
+
+        vm.expectRevert(
+            BaseVault.BaseVault__WithdrawAmountIsMoreThanCurrentShare.selector
+        );
+        baseVault.withdraw(FIRST_AMOUNT + 1);
+        vm.stopPrank();
+    }
+    function test_Withdraw_AfterAssetIncrease() external {
+        vm.prank(USER);
+        baseVault.deposit(FIRST_AMOUNT);
+
+        vm.prank(ATTACKER);
+        mockToken.transfer(address(baseVault), 900);
+
+        vm.prank(USER);
+        baseVault.withdraw(FIRST_AMOUNT);
+
+        assertEq(STARTING_BALANCE + 900, mockToken.balanceOf(USER));
+    }
 }
