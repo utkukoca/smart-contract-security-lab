@@ -6,6 +6,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract BaseVault {
     error BaseVault__ZeroAmount();
+    error BaseVault__WithdrawAmountIsMoreThanCurrentShare();
 
     IERC20 public immutable asset;
     uint256 public totalShares;
@@ -14,6 +15,7 @@ contract BaseVault {
     constructor(IERC20 _asset) {
         asset = _asset;
     }
+
     function deposit(
         uint256 _amountToken
     ) public returns (uint256 _shareAmount) {
@@ -35,5 +37,21 @@ contract BaseVault {
         asset.transferFrom(msg.sender, address(this), _amountToken);
         totalShares += shares;
         return (shares);
+    }
+
+    function withdraw(uint256 _shareAmount) public returns (uint256) {
+        if (_shareAmount == 0) {
+            revert BaseVault__ZeroAmount();
+        }
+        if (_shareAmount <= balanceOf[msg.sender]) {
+            uint256 tokenWithdrawAmount = (_shareAmount *
+                asset.balanceOf(address(this))) / totalShares;
+            balanceOf[msg.sender] -= _shareAmount;
+            totalShares -= _shareAmount;
+            asset.transfer(msg.sender, tokenWithdrawAmount);
+            return (tokenWithdrawAmount);
+        } else {
+            revert BaseVault__WithdrawAmountIsMoreThanCurrentShare();
+        }
     }
 }
