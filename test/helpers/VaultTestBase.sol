@@ -15,6 +15,7 @@ abstract contract VaultTestBase is Test {
 
     uint256 public constant DECIMALS = 10 ** 18;
     uint256 public constant FIRST_AMOUNT = 100 * DECIMALS;
+    uint256 public constant STARTING_BALANCE = 1000000000 * DECIMALS;
 
     function setUp() external {
         mockToken = new MockToken();
@@ -26,7 +27,7 @@ abstract contract VaultTestBase is Test {
     }
 
     function _fund(address _address) internal {
-        mockToken.mint(_address, 1000000000 * DECIMALS); //mint mock money for _address
+        mockToken.mint(_address, STARTING_BALANCE); //mint mock money for _address
         vm.prank(_address);
         mockToken.approve(address(baseVault), type(uint256).max); //we have to use approve in this section if we use in BaseVault we approve to user can use token which in BaseVault
     }

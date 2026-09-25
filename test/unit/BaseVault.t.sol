@@ -86,4 +86,50 @@ contract BaseVaultTest is VaultTestBase {
 
         assertEq(10 * DECIMALS, baseVault.balanceOf(USER2));
     }
+
+    function test_Withdraw_UpdatesAllStatesCorrectly() external {
+        //arrange
+        vm.startPrank(USER);
+
+        //act
+        baseVault.deposit(FIRST_AMOUNT);
+        baseVault.withdraw(FIRST_AMOUNT);
+
+        vm.stopPrank();
+
+        //assert
+
+        //A.USER share holders equal 0
+        assertEq(0, baseVault.balanceOf(USER));
+        //B.VAULT token equal 0
+        assertEq(0, mockToken.balanceOf(address(baseVault)));
+        //C.VAULT share holders equal 0
+        assertEq(0, baseVault.totalShares());
+        //D.USER balance have to be same
+        assertEq(STARTING_BALANCE, mockToken.balanceOf(USER));
+    }
+    function test_Partial_Withdraw_UpdatesAllStatesCorrectly() external {
+        //arrange
+        vm.startPrank(USER);
+
+        //act
+        baseVault.deposit(FIRST_AMOUNT);
+        baseVault.withdraw(FIRST_AMOUNT / 2);
+
+        vm.stopPrank();
+
+        //assert
+
+        //A.USER share holders
+        assertEq(FIRST_AMOUNT / 2, baseVault.balanceOf(USER));
+        //B.VAULT token
+        assertEq(FIRST_AMOUNT / 2, mockToken.balanceOf(address(baseVault)));
+        //C.VAULT share holders
+        assertEq(FIRST_AMOUNT / 2, baseVault.totalShares());
+        //D.USER balance
+        assertEq(
+            STARTING_BALANCE - (FIRST_AMOUNT / 2),
+            mockToken.balanceOf(USER)
+        );
+    }
 }
