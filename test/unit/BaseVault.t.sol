@@ -1,30 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {VaultTestBase} from "../helpers/VaultTestBase.sol";
 import {BaseVault} from "../../src/BaseVault.sol";
-import {MockToken} from "../test-contracts/MockToken.sol";
-import {Test, console} from "forge-std/Test.sol";
 
-contract BaseVaultTest is Test {
-    BaseVault public baseVault;
-    MockToken public mockToken;
-    address public USER = makeAddr("user"); //test address
-    address public USER2 = makeAddr("user2"); //test address
-    uint256 public constant FIRST_AMOUNT = 100;
-
-    function setUp() external {
-        mockToken = new MockToken();
-        baseVault = new BaseVault(mockToken);
-
-        mockToken.mint(USER, 1000 * 10 ** 18); //mint mock money for USER
-        vm.prank(USER);
-        mockToken.approve(address(baseVault), type(uint256).max); //we have to use approve in this section if we use in BaseVault we approve to user can use token which in BaseVault
-
-        mockToken.mint(USER2, 1000 * 10 ** 18); //mint mock money for USER2
-        vm.prank(USER2);
-        mockToken.approve(address(baseVault), type(uint256).max); //we have to use approve in this section if we use in BaseVault we approve to user can use token which in BaseVault
-    }
-
+contract BaseVaultTest is VaultTestBase {
     function testEqTokenAddress() external view {
         assertEq(address(mockToken), address(baseVault.asset()));
     }
@@ -85,7 +65,25 @@ contract BaseVaultTest is Test {
         //assert
 
         //USER1 DEPLOY 100 AND TAKE 100 SHARES USER2 DEPLOY 200 HAVE TO TAKE 200 1/3 AND 2/3
-        assertEq(100, baseVault.balanceOf(USER));
-        assertEq(200, baseVault.balanceOf(USER2));
+        assertEq(FIRST_AMOUNT, baseVault.balanceOf(USER));
+        assertEq(FIRST_AMOUNT * 2, baseVault.balanceOf(USER2));
+    }
+
+    function test_DonationIncreasesSharePrice() external {
+        //vault can increase but users have to be get fair shares
+        vm.prank(USER);
+        baseVault.deposit(FIRST_AMOUNT);
+
+        vm.prank(ATTACKER);
+        mockToken.transfer(address(baseVault), 900 * DECIMALS);
+
+        vm.prank(USER2);
+        baseVault.deposit(FIRST_AMOUNT);
+
+        // assert
+        // total value 1000 and total shares 100 so 1 shares equal to 10 --> USER2 deposit 100 so have to get 10 shares
+        // TOKEN_AMOUNT = VAULT_ASSETS X DEPOSITOR_SHARES
+
+        assertEq(10 * DECIMALS, baseVault.balanceOf(USER2));
     }
 }
