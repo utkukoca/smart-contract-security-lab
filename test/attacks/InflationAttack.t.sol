@@ -11,7 +11,7 @@ import {VaultTestBase} from "../helpers/VaultTestBase.sol";
 //          shares this amount will increase vault asset and asset price of attacker's shares increase
 
 contract InflationAttack is VaultTestBase {
-    uint256 public ATTACKER_SHARE_AMOUNT = 1;
+    uint256 constant ATTACKER_SHARE_AMOUNT = 1;
 
     function test_attack_FirstDepositorStealsVictimDeposit() external {
         vm.startPrank(ATTACKER);
