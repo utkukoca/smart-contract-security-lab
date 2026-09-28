@@ -26,7 +26,7 @@ abstract contract VaultTestBase is Test {
         mockToken = new MockToken();
         baseVault = new BaseVault(mockToken);
         deadShareVault = new DeadShareVault(mockToken, address(0), 1000);
-        mockToken.transfer(address(deadShareVault), 1000);
+        mockToken.transfer(address(deadShareVault), 1000 * DECIMALS); //for solving chicken egg problem
         internalAccountingVault = new InternalAccountingVault(mockToken);
 
         _fund(USER);

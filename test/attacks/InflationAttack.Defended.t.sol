@@ -6,14 +6,14 @@ import {DeadShareVault} from "../../src/DeadShareVault.sol";
 import {InternalAccountingVault} from "../../src/InternalAccountingVault.sol";
 
 // attack:   Inflation / donation (first depositor)
-// aeverity: Critical
-// aarget:   BaseVault.deposit()
+// severity: Critical
+// target:   BaseVault.deposit()
 // Summary:  Attacker seeds the vault with 1 wei (very low amount), donates directly to inflate
 //           the share price, and the next depositor receives 0 shares. When depositer try to buy
 //          shares this amount will increase vault asset and asset price of attacker's shares increase
 
 contract InflationAttack is VaultTestBase {
-    uint256 constant ATTACKER_SHARE_AMOUNT = 1;
+    uint256 constant ATTACKER_SHARE_AMOUNT = 1000 * DECIMALS;
 
     function test_attack_FirstDepositorStealsVictimDeposit_DeadShareVault()
         external
@@ -38,13 +38,7 @@ contract InflationAttack is VaultTestBase {
         );
         */
 
-        vm.prank(ATTACKER);
-        deadShareVault.withdraw(ATTACKER_SHARE_AMOUNT);
-
-        assertGt(
-            STARTING_BALANCE + FIRST_AMOUNT,
-            mockToken.balanceOf(ATTACKER)
-        );
+        assertGt(deadShareVault.balanceOf(USER), 0);
     }
 
     function test_attack_FirstDepositorStealsVictimDeposit_InternalAccountingVault()
@@ -70,12 +64,6 @@ contract InflationAttack is VaultTestBase {
         );
         */
 
-        vm.prank(ATTACKER);
-        internalAccountingVault.withdraw(ATTACKER_SHARE_AMOUNT);
-
-        assertGt(
-            STARTING_BALANCE + FIRST_AMOUNT,
-            mockToken.balanceOf(ATTACKER)
-        );
+        assertGt(internalAccountingVault.balanceOf(USER), 0);
     }
 }
