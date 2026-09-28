@@ -41,12 +41,63 @@ contract InflationAttack is VaultTestBase {
         assertGt(deadShareVault.balanceOf(USER), 0);
     }
 
+    function test_DeadShares_BreaksUnderMassiveDonation() external {
+        vm.startPrank(ATTACKER);
+        deadShareVault.deposit(ATTACKER_SHARE_AMOUNT);
+        mockToken.transfer(address(deadShareVault), 1000000000 * DECIMALS);
+        vm.stopPrank();
+
+        vm.prank(USER);
+        deadShareVault.deposit(FIRST_AMOUNT);
+
+        // assert
+        // TOKEN_AMOUNT = VAULT_ASSETS X DEPOSITOR_SHARES
+        // solution is 0.111... but solidity always rounds down so USER get 0 shares but ASSET AMOUNT increased now ATTACKER 1 shares equalt to aprx. 1000
+
+        /*
+        assertEq(0, baseVault.balanceOf(USER));
+        assertEq(
+            900 * DECIMALS + FIRST_AMOUNT + 1,
+            mockToken.balanceOf(address(baseVault))
+        );
+        */
+
+        assertEq(deadShareVault.balanceOf(USER), 0);
+    }
+
     function test_attack_FirstDepositorStealsVictimDeposit_InternalAccountingVault()
         external
     {
         vm.startPrank(ATTACKER);
         internalAccountingVault.deposit(ATTACKER_SHARE_AMOUNT);
         mockToken.transfer(address(internalAccountingVault), 900 * DECIMALS);
+        vm.stopPrank();
+
+        vm.prank(USER);
+        internalAccountingVault.deposit(FIRST_AMOUNT);
+
+        // assert
+        // TOKEN_AMOUNT = VAULT_ASSETS X DEPOSITOR_SHARES
+        // solution is 0.111... but solidity always rounds down so USER get 0 shares but ASSET AMOUNT increased now ATTACKER 1 shares equalt to aprx. 1000
+
+        /*
+        assertEq(0, baseVault.balanceOf(USER));
+        assertEq(
+            900 * DECIMALS + FIRST_AMOUNT + 1,
+            mockToken.balanceOf(address(baseVault))
+        );
+        */
+
+        assertGt(internalAccountingVault.balanceOf(USER), 0);
+    }
+
+    function test_InternalAccounting_ResistsMassiveDonation() external {
+        vm.startPrank(ATTACKER);
+        internalAccountingVault.deposit(ATTACKER_SHARE_AMOUNT);
+        mockToken.transfer(
+            address(internalAccountingVault),
+            1000000000 * DECIMALS
+        );
         vm.stopPrank();
 
         vm.prank(USER);

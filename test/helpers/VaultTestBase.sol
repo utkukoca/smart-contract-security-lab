@@ -20,7 +20,7 @@ abstract contract VaultTestBase is Test {
 
     uint256 public constant DECIMALS = 10 ** 18;
     uint256 public constant FIRST_AMOUNT = 100 * DECIMALS;
-    uint256 public constant STARTING_BALANCE = 1000000000 * DECIMALS;
+    uint256 public constant STARTING_BALANCE = 1000000000000000 * DECIMALS;
 
     function setUp() public virtual {
         mockToken = new MockToken();
