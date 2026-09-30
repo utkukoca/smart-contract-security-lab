@@ -36,8 +36,8 @@ contract InternalAccountingVault {
                     (_amountToken * totalShares) /
                     balanceOfVault[address(this)];
                 balanceOf[msg.sender] += shares;
-                balanceOf[address(this)] =
-                    balanceOf[address(this)] +
+                balanceOfVault[address(this)] =
+                    balanceOfVault[address(this)] +
                     _amountToken;
             }
         }
@@ -56,8 +56,8 @@ contract InternalAccountingVault {
                     balanceOfVault[address(this)]) / totalShares);
                 balanceOf[msg.sender] -= _shareAmount;
                 totalShares -= _shareAmount;
-                balanceOf[address(this)] =
-                    balanceOf[address(this)] -
+                balanceOfVault[address(this)] =
+                    balanceOfVault[address(this)] -
                     tokenWithdrawAmount;
                 asset.transfer(msg.sender, tokenWithdrawAmount);
                 return (tokenWithdrawAmount);
