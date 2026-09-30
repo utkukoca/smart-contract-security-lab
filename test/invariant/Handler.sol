@@ -21,6 +21,7 @@ contract VaultHandler is Test {
 
     function deposit(uint256 amount, uint256 actorSeed) external {
         address actor = actors[actorSeed % actors.length];
+        if (token.balanceOf(actor) == 0) return;
         amount = bound(amount, 1, token.balanceOf(actor));
         vm.prank(actor);
         internalAccountingVault.deposit(amount);
