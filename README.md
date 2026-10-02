@@ -55,7 +55,7 @@ src/
 test/
   unit/            BaseVault.t.sol, InternalAccountingVault.t.sol
   attacks/         InflationAttack.t.sol, InflationAttack.Defended.t.sol,
-                   Reentrancy.t.sol
+                   ReentrancyAttacker.t.sol
   invariant/       VaultInvariant.t.sol, Handler.sol
   helpers/         VaultTestBase.sol
   test-contracts/  MockToken.sol
@@ -86,5 +86,5 @@ forge test --match-path test/invariant/VaultInvariant.t.sol -vv
 See the reentrancy staircase in the trace:
 
 ```bash
-forge test --match-path test/attacks/Reentrancy.t.sol -vvvv
+forge test --match-path test/attacks/ReentrancyAttacker.t.sol -vvvv
 ```
