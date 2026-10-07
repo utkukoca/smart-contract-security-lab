@@ -16,10 +16,17 @@ contract AccessControlTest is Test {
         mockToken = new MockToken();
         rescuableVault = new RescuableVault(mockToken);
         fund(USER);
-        fund(ATTACKER);
+    }
+
+    function testStealToken() external {
+        vm.prank(USER);
+        mockToken.transfer(address(rescuableVault), 1000 * DECIMALS);
+        vm.prank(ATTACKER);
+        rescuableVault.rescueTokens(ATTACKER);
+        assertEq(1000 * DECIMALS, mockToken.balanceOf(ATTACKER));
     }
     function fund(address _address) internal {
-        mockToken.mint(_address, STARTING_BALANCE); //mint mock money for _address
+        mockToken.mint(_address, STARTING_BALANCE * DECIMALS); //mint mock money for _address
         vm.startPrank(_address);
         mockToken.approve(address(rescuableVault), type(uint256).max); //we have to use approve in this section if we use in BaseVault we approve to user can use token which in BaseVault
         vm.stopPrank();
