@@ -25,6 +25,19 @@ contract AccessControlTest is Test {
         rescuableVault.rescueTokens(ATTACKER);
         assertEq(1000 * DECIMALS, mockToken.balanceOf(ATTACKER));
     }
+    function testStealTokenIsAffectOtherFunction() external {
+        vm.startPrank(USER);
+        rescuableVault.deposit(1000 * DECIMALS);
+        mockToken.transfer(address(rescuableVault), 1000 * DECIMALS);
+        vm.stopPrank();
+        vm.prank(ATTACKER);
+        rescuableVault.rescueTokens(ATTACKER);
+        vm.startPrank(USER);
+        uint256 shareAmount = rescuableVault.balanceOf(USER);
+        console.log(shareAmount);
+        rescuableVault.withdraw(shareAmount);
+        assertEq(0, rescuableVault.balanceOf(USER));
+    }
     function fund(address _address) internal {
         mockToken.mint(_address, STARTING_BALANCE * DECIMALS); //mint mock money for _address
         vm.startPrank(_address);
