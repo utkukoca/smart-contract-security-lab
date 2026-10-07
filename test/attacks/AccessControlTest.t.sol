@@ -35,8 +35,18 @@ contract AccessControlTest is Test {
         vm.prank(USER);
         mockToken.transfer(address(rescuableVaultFixed), 1000 * DECIMALS);
         vm.prank(ATTACKER);
-        vm.expectRevert();
+        vm.expectRevert(
+            RescuableVaultFixed.RescuableVaultFixed__NotOwner.selector
+        );
         rescuableVaultFixed.rescueTokens(ATTACKER);
+    }
+    function testOwner() external {
+        vm.prank(USER);
+        mockToken.transfer(address(rescuableVault), 1000 * DECIMALS);
+        vm.prank(address(this));
+        address RECEIVER = makeAddr("receiver");
+        rescuableVault.rescueTokens(RECEIVER);
+        assertEq(1000 * DECIMALS, mockToken.balanceOf(RECEIVER));
     }
     function testStealTokenIsAffectOtherFunction() external {
         vm.startPrank(USER);
@@ -48,8 +58,11 @@ contract AccessControlTest is Test {
         vm.startPrank(USER);
         uint256 shareAmount = rescuableVault.balanceOf(USER);
         console.log(shareAmount);
+        uint256 firstBalance = mockToken.balanceOf(USER);
         rescuableVault.withdraw(shareAmount);
+        uint256 finalBalance = mockToken.balanceOf(USER);
         assertEq(0, rescuableVault.balanceOf(USER));
+        assertEq(finalBalance - firstBalance, 1000 * DECIMALS);
     }
 
     function fund(address _address, address _contract) internal {
