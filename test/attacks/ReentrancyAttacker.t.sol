@@ -57,6 +57,6 @@ contract TestAttacker is Test {
         console.log(address(vulnerableBank).balance);
         console.log(address(ATTACKER).balance);
         assertEq(0, address(vulnerableBank).balance);
-        assertEq(11 * 10 ** 18, address(ATTACKER).balance);
+        assertEq(11* 10**18, address(ATTACKER).balance);
     }
 }
