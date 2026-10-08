@@ -42,10 +42,10 @@ contract AccessControlTest is Test {
     }
     function testOwner() external {
         vm.prank(USER);
-        mockToken.transfer(address(rescuableVault), 1000 * DECIMALS);
+        mockToken.transfer(address(rescuableVaultFixed), 1000 * DECIMALS);
         vm.prank(address(this));
         address RECEIVER = makeAddr("receiver");
-        rescuableVault.rescueTokens(RECEIVER);
+        rescuableVaultFixed.rescueTokens(RECEIVER);
         assertEq(1000 * DECIMALS, mockToken.balanceOf(RECEIVER));
     }
     function testStealTokenIsAffectOtherFunction() external {
