@@ -4,7 +4,7 @@ A hands-on smart contract security lab. I write contracts from scratch,
 break them with attack PoCs, fix them, and test them with unit, attack and
 invariant tests. Every finding has a written report.
 
-Modules: **ERC-4626 vaults** · **Reentrancy** · **Access control**
+Modules: **ERC-4626 vaults** · **Reentrancy** · **Access control** · **Denial of Service**
 
 > ⚠️ Educational code. Not for production use.
 
@@ -16,6 +16,7 @@ Modules: **ERC-4626 vaults** · **Reentrancy** · **Access control**
 | [F-02](docs/findings/inflation_f02.md) | Withdraw always reverts (wrong mapping → underflow) | `InternalAccountingVault` | High | Invariant test | Fixed |
 | [F-03](docs/findings/reentrancy_f03.md) | Reentrancy: ETH sent before balance update | `VulnerableBank` | Critical | Attack PoC | Reproduced · Fix planned |
 | [F-04](docs/findings/access_control_f04.md) | Missing access control: anyone can call `rescueTokens` | `RescuableVault` | High | Attack PoC | Fixed |
+| [F-05](docs/findings/dos_f05.md) | DoS: a bidder that cannot receive ETH blocks all higher bids | `VulnerableAuction` | High | Attack PoC | Reproduced · Fix planned |
 
 ## Contracts
 
@@ -40,6 +41,12 @@ Modules: **ERC-4626 vaults** · **Reentrancy** · **Access control**
 | `RescuableVault` | `InternalAccountingVault` with a rescue function for directly sent tokens. No owner check. | Vulnerable to F-04 (on purpose) |
 | `RescuableVaultFixed` | Same vault. `rescueTokens` reverts if the caller is not the owner. | F-04 fixed |
 
+### Denial of Service
+
+| Contract | Idea | Status |
+|---|---|---|
+| `VulnerableAuction` | Auction that refunds the old bidder inside `bid()` and reverts if the refund fails. | Vulnerable to F-05 (on purpose) |
+
 ## Testing approach
 
 - **Unit tests** (`test/unit/`) — normal user flows: deposit, withdraw, edge
@@ -61,16 +68,19 @@ src/
   InternalAccountingVault.sol
   reentrancy/      VulnerableBank.sol
   access-control/  RescuableVault.sol, RescuableVaultFixed.sol
+  dos/             VulnerableAuction.sol
 test/
   unit/            BaseVault.t.sol, InternalAccountingVault.t.sol
   attacks/         InflationAttack.t.sol, InflationAttack.Defended.t.sol,
-                   ReentrancyAttacker.t.sol, AccessControlTest.t.sol
+                   ReentrancyAttacker.t.sol, AccessControlTest.t.sol,
+                   DosAttack.t.sol
   invariant/       VaultInvariant.t.sol, Handler.sol
   helpers/         VaultTestBase.sol
   test-contracts/  MockToken.sol
 docs/
   findings/        inflation_f01.md, inflation_f02.md,
-                   reentrancy_f03.md, access_control_f04.md
+                   reentrancy_f03.md, access_control_f04.md,
+                   dos_f05.md
 ```
 
 ## Run
