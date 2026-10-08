@@ -94,25 +94,25 @@ contract VulnerableAuctionTest is Test {
         assertEq(USER, vulnerableAuctionFixed.lastGetter());
         vm.prank(ATTACKER);
         attackAuction.attackFixed{value: 2 ether}();
-        assertEq(4 ether, USER.balance); // bid() para göndermiyor, USER hâlâ 4 ether'de
-        assertEq(1 ether, vulnerableAuctionFixed.pendingRefunds(USER)); // alacağı deftere yazıldı
+        assertEq(4 ether, USER.balance);
+        assertEq(1 ether, vulnerableAuctionFixed.pendingRefunds(USER));
         assertEq(2 ether, vulnerableAuctionFixed.lastBid());
         assertEq(address(attackAuction), vulnerableAuctionFixed.lastGetter());
 
         vm.prank(USER2);
-        vulnerableAuctionFixed.bid{value: 3 ether}(); // revert YOK, artık DoS çalışmıyor
+        vulnerableAuctionFixed.bid{value: 3 ether}();
         assertEq(3 ether, vulnerableAuctionFixed.lastBid());
         assertEq(USER2, vulnerableAuctionFixed.lastGetter());
         assertEq(
             2 ether,
             vulnerableAuctionFixed.pendingRefunds(address(attackAuction))
         );
-        assertEq(6 ether, address(vulnerableAuctionFixed).balance); // 1 + 2 + 3, kimseye para gitmedi
+        assertEq(6 ether, address(vulnerableAuctionFixed).balance);
 
         uint256 balanceBefore = USER.balance;
         vm.prank(USER);
         vulnerableAuctionFixed.withdraw();
-        assertEq(1 ether, USER.balance - balanceBefore); // USER parasını kendisi çekti
+        assertEq(1 ether, USER.balance - balanceBefore);
         assertEq(0, vulnerableAuctionFixed.pendingRefunds(USER));
 
         vm.prank(address(attackAuction));
@@ -121,6 +121,6 @@ contract VulnerableAuctionTest is Test {
                 .VulnerableAuctionFixed__PaymentUnsuccesfull
                 .selector
         );
-        vulnerableAuctionFixed.withdraw(); // sadece saldırganın kendi çağrısı revert eder
+        vulnerableAuctionFixed.withdraw();
     }
 }
