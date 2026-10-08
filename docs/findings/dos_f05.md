@@ -5,7 +5,7 @@
 | **Severity** | High |
 | **Target** | `VulnerableAuction.bid()` |
 | **Category** | Denial of Service / Failed external call (push payment) |
-| **Status** | Reproduced · Fix planned |
+| **Status** | Reproduced · Fixed |
 
 ## Summary
 
@@ -72,6 +72,9 @@ attacker contract stays the highest bidder with only 2 ETH.
   - `testDosAttack` — after the attacker's bid, a 3 ETH bid reverts with
     `VulnerableAuction__PaymentUnsuccesfull`; highest bidder, highest bid and
     auction balance do not change
+  - `testDosAttackFixed` — the same attack on `VulnerableAuctionFixed`: the
+    3 ETH bid succeeds, the user withdraws their refund, and only the
+    attacker's own `withdraw()` reverts
 
 ```bash
 forge test --match-path test/attacks/DosAttack.t.sol -vvvv
@@ -79,19 +82,45 @@ forge test --match-path test/attacks/DosAttack.t.sol -vvvv
 
 The `-vvvv` trace shows the failed `call` to `AttackAuction` inside `bid()`.
 
-## Recommendation
+## Fix
 
-To be implemented and tested in the next step:
+`VulnerableAuctionFixed` uses **pull over push** (the withdrawal pattern).
+`bid()` does not send ETH anymore. It only records the refund, and each
+bidder takes their own money with `withdraw()`.
 
-- **Pull over push (withdrawal pattern):** do not send the refund inside
-  `bid()`. Save it in a mapping (`pendingReturns[oldGetter] += oldBid`) and
-  add a `withdraw()` function. Each user takes their own refund. If the
-  attacker's contract cannot receive ETH, only the attacker's own withdraw
-  fails.
-- **Do not revert on a failed refund:** if the `call` fails, keep the amount
-  in the mapping instead of reverting. The new bid still succeeds.
-- The new `withdraw()` sends ETH, so it needs CEI or a reentrancy guard (see
-  F-03).
+```diff
++ mapping(address => uint256) public pendingRefunds;
+
+  if (msg.value > lastBid) {
+-     address oldGetter = lastGetter;
+-     uint256 oldBid = lastBid;
++     pendingRefunds[lastGetter] += lastBid;
+      lastGetter = msg.sender;
+      lastBid = msg.value;
+-     (bool success, ) = oldGetter.call{value: oldBid}("");
+-     if (!success) revert VulnerableAuction__PaymentUnsuccesfull();
+  }
+```
+
+```solidity
+function withdraw() public {
+    uint256 amount = pendingRefunds[msg.sender];
+    if (amount == 0) revert VulnerableAuctionFixed__NotTrueDebtAddress();
+    pendingRefunds[msg.sender] = 0;                          // effect first
+    (bool success, ) = msg.sender.call{value: amount}("");   // then send
+    if (!success) revert VulnerableAuctionFixed__PaymentUnsuccesfull();
+}
+```
+
+- `bid()` has no external call, so no other address can make it fail.
+- If the attacker's contract cannot receive ETH, only the attacker's own
+  `withdraw()` reverts. Other users are not affected.
+- `withdraw()` sets the refund to 0 **before** it sends ETH (CEI), so it is
+  not open to reentrancy (see F-03).
+
+After the fix, with the same attack: the user bids 1 ETH, the attacker
+contract bids 2 ETH, then a second user bids 3 ETH and it succeeds. The
+auction holds 6 ETH (1 + 2 + 3) until the old bidders withdraw.
 
 ## Lessons
 

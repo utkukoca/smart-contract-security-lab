@@ -16,7 +16,7 @@ Modules: **ERC-4626 vaults** · **Reentrancy** · **Access control** · **Denial
 | [F-02](docs/findings/inflation_f02.md) | Withdraw always reverts (wrong mapping → underflow) | `InternalAccountingVault` | High | Invariant test | Fixed |
 | [F-03](docs/findings/reentrancy_f03.md) | Reentrancy: ETH sent before balance update | `VulnerableBank` | Critical | Attack PoC | Reproduced · Fix planned |
 | [F-04](docs/findings/access_control_f04.md) | Missing access control: anyone can call `rescueTokens` | `RescuableVault` | High | Attack PoC | Fixed |
-| [F-05](docs/findings/dos_f05.md) | DoS: a bidder that cannot receive ETH blocks all higher bids | `VulnerableAuction` | High | Attack PoC | Reproduced · Fix planned |
+| [F-05](docs/findings/dos_f05.md) | DoS: a bidder that cannot receive ETH blocks all higher bids | `VulnerableAuction` | High | Attack PoC | Fixed |
 
 ## Contracts
 
@@ -46,6 +46,7 @@ Modules: **ERC-4626 vaults** · **Reentrancy** · **Access control** · **Denial
 | Contract | Idea | Status |
 |---|---|---|
 | `VulnerableAuction` | Auction that refunds the old bidder inside `bid()` and reverts if the refund fails. | Vulnerable to F-05 (on purpose) |
+| `VulnerableAuctionFixed` | Same auction with pull payments. `bid()` records the refund, each bidder takes it with `withdraw()`. | F-05 fixed |
 
 ## Testing approach
 
@@ -68,7 +69,7 @@ src/
   InternalAccountingVault.sol
   reentrancy/      VulnerableBank.sol
   access-control/  RescuableVault.sol, RescuableVaultFixed.sol
-  dos/             VulnerableAuction.sol
+  dos/             VulnerableAuction.sol, VulnerableAuctionFixed.sol
 test/
   unit/            BaseVault.t.sol, InternalAccountingVault.t.sol
   attacks/         InflationAttack.t.sol, InflationAttack.Defended.t.sol,
