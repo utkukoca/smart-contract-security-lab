@@ -31,15 +31,15 @@ contract AccessControlTest is Test {
         rescuableVault.rescueTokens(ATTACKER);
         assertEq(1000 * DECIMALS, mockToken.balanceOf(ATTACKER));
     }
+
     function testStealTokenFixed() external {
         vm.prank(USER);
         mockToken.transfer(address(rescuableVaultFixed), 1000 * DECIMALS);
         vm.prank(ATTACKER);
-        vm.expectRevert(
-            RescuableVaultFixed.RescuableVaultFixed__NotOwner.selector
-        );
+        vm.expectRevert(RescuableVaultFixed.RescuableVaultFixed__NotOwner.selector);
         rescuableVaultFixed.rescueTokens(ATTACKER);
     }
+
     function testOwner() external {
         vm.prank(USER);
         mockToken.transfer(address(rescuableVaultFixed), 1000 * DECIMALS);
@@ -48,6 +48,7 @@ contract AccessControlTest is Test {
         rescuableVaultFixed.rescueTokens(RECEIVER);
         assertEq(1000 * DECIMALS, mockToken.balanceOf(RECEIVER));
     }
+
     function testStealTokenIsAffectOtherFunction() external {
         vm.startPrank(USER);
         rescuableVault.deposit(1000 * DECIMALS);

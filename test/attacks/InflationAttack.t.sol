@@ -37,9 +37,6 @@ contract InflationAttack is VaultTestBase {
         vm.prank(ATTACKER);
         baseVault.withdraw(ATTACKER_SHARE_AMOUNT);
 
-        assertEq(
-            STARTING_BALANCE + FIRST_AMOUNT,
-            mockToken.balanceOf(ATTACKER)
-        );
+        assertEq(STARTING_BALANCE + FIRST_AMOUNT, mockToken.balanceOf(ATTACKER));
     }
 }

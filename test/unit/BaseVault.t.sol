@@ -108,6 +108,7 @@ contract BaseVaultTest is VaultTestBase {
         //D.USER balance have to be same
         assertEq(STARTING_BALANCE, mockToken.balanceOf(USER));
     }
+
     function test_Partial_Withdraw_UpdatesAllStatesCorrectly() external {
         //arrange
         vm.startPrank(USER);
@@ -127,10 +128,7 @@ contract BaseVaultTest is VaultTestBase {
         //C.VAULT share holders
         assertEq(FIRST_AMOUNT / 2, baseVault.totalShares());
         //D.USER balance
-        assertEq(
-            STARTING_BALANCE - (FIRST_AMOUNT / 2),
-            mockToken.balanceOf(USER)
-        );
+        assertEq(STARTING_BALANCE - (FIRST_AMOUNT / 2), mockToken.balanceOf(USER));
     }
 
     function test_Withdraw_ZeroAmount() external {
@@ -140,16 +138,16 @@ contract BaseVaultTest is VaultTestBase {
         baseVault.withdraw(0);
         vm.stopPrank();
     }
+
     function test_Withdraw_MoreThan_HavingOne() external {
         vm.startPrank(USER);
         baseVault.deposit(FIRST_AMOUNT);
 
-        vm.expectRevert(
-            BaseVault.BaseVault__WithdrawAmountIsMoreThanCurrentShare.selector
-        );
+        vm.expectRevert(BaseVault.BaseVault__WithdrawAmountIsMoreThanCurrentShare.selector);
         baseVault.withdraw(FIRST_AMOUNT + 1);
         vm.stopPrank();
     }
+
     function test_Withdraw_AfterAssetIncrease() external {
         vm.prank(USER);
         baseVault.deposit(FIRST_AMOUNT);

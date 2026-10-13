@@ -18,27 +18,19 @@ contract InternalAccountingVault {
         asset = _asset;
     }
 
-    function deposit(
-        uint256 _amountToken
-    ) public returns (uint256 _shareAmount) {
+    function deposit(uint256 _amountToken) public returns (uint256 _shareAmount) {
         uint256 shares;
         if (_amountToken == 0) {
             revert InternalAccountingVault__ZeroAmount();
         } else {
             if (totalShares == 0) {
                 balanceOf[msg.sender] = balanceOf[msg.sender] + _amountToken;
-                balanceOfVault[address(this)] =
-                    balanceOfVault[address(this)] +
-                    _amountToken;
+                balanceOfVault[address(this)] = balanceOfVault[address(this)] + _amountToken;
                 shares = _amountToken;
             } else {
-                shares =
-                    (_amountToken * totalShares) /
-                    balanceOfVault[address(this)];
+                shares = (_amountToken * totalShares) / balanceOfVault[address(this)];
                 balanceOf[msg.sender] += shares;
-                balanceOfVault[address(this)] =
-                    balanceOfVault[address(this)] +
-                    _amountToken;
+                balanceOfVault[address(this)] = balanceOfVault[address(this)] + _amountToken;
             }
         }
 
@@ -52,13 +44,10 @@ contract InternalAccountingVault {
             revert InternalAccountingVault__ZeroAmount();
         } else {
             if (_shareAmount <= balanceOf[msg.sender]) {
-                uint256 tokenWithdrawAmount = ((_shareAmount *
-                    balanceOfVault[address(this)]) / totalShares);
+                uint256 tokenWithdrawAmount = ((_shareAmount * balanceOfVault[address(this)]) / totalShares);
                 balanceOf[msg.sender] -= _shareAmount;
                 totalShares -= _shareAmount;
-                balanceOfVault[address(this)] =
-                    balanceOfVault[address(this)] -
-                    tokenWithdrawAmount;
+                balanceOfVault[address(this)] = balanceOfVault[address(this)] - tokenWithdrawAmount;
                 asset.transfer(msg.sender, tokenWithdrawAmount);
                 return (tokenWithdrawAmount);
             } else {

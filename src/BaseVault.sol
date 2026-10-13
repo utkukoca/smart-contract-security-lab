@@ -16,9 +16,7 @@ contract BaseVault {
         asset = _asset;
     }
 
-    function deposit(
-        uint256 _amountToken
-    ) public returns (uint256 _shareAmount) {
+    function deposit(uint256 _amountToken) public returns (uint256 _shareAmount) {
         uint256 shares;
         if (_amountToken == 0) {
             revert BaseVault__ZeroAmount();
@@ -27,9 +25,7 @@ contract BaseVault {
                 balanceOf[msg.sender] = balanceOf[msg.sender] + _amountToken;
                 shares = _amountToken;
             } else {
-                shares =
-                    (_amountToken * totalShares) /
-                    asset.balanceOf(address(this));
+                shares = (_amountToken * totalShares) / asset.balanceOf(address(this));
                 balanceOf[msg.sender] += shares;
             }
         }
@@ -44,8 +40,7 @@ contract BaseVault {
             revert BaseVault__ZeroAmount();
         } else {
             if (_shareAmount <= balanceOf[msg.sender]) {
-                uint256 tokenWithdrawAmount = (_shareAmount *
-                    asset.balanceOf(address(this))) / totalShares;
+                uint256 tokenWithdrawAmount = (_shareAmount * asset.balanceOf(address(this))) / totalShares;
                 balanceOf[msg.sender] -= _shareAmount;
                 totalShares -= _shareAmount;
                 asset.transfer(msg.sender, tokenWithdrawAmount);

@@ -11,23 +11,26 @@ contract AttackAuction {
     VulnerableAuctionFixed vulnerableAuctionFixed;
     error AttackAuction__NotOwner();
 
-    constructor(
-        VulnerableAuction _vulnerableAuction,
-        VulnerableAuctionFixed _vulnerableAuctionFixed
-    ) {
+    constructor(VulnerableAuction _vulnerableAuction, VulnerableAuctionFixed _vulnerableAuctionFixed) {
         owner = msg.sender;
         vulnerableAuction = _vulnerableAuction;
         vulnerableAuctionFixed = _vulnerableAuctionFixed;
     }
+
     function attack() public payable {
         if (owner == msg.sender) {
             vulnerableAuction.bid{value: msg.value}();
-        } else revert AttackAuction__NotOwner();
+        } else {
+            revert AttackAuction__NotOwner();
+        }
     }
+
     function attackFixed() public payable {
         if (owner == msg.sender) {
             vulnerableAuctionFixed.bid{value: msg.value}();
-        } else revert AttackAuction__NotOwner();
+        } else {
+            revert AttackAuction__NotOwner();
+        }
     }
 }
 
@@ -46,11 +49,9 @@ contract VulnerableAuctionTest is Test {
         vulnerableAuction = new VulnerableAuction();
         vulnerableAuctionFixed = new VulnerableAuctionFixed();
         vm.prank(ATTACKER);
-        attackAuction = new AttackAuction(
-            vulnerableAuction,
-            vulnerableAuctionFixed
-        );
+        attackAuction = new AttackAuction(vulnerableAuction, vulnerableAuctionFixed);
     }
+
     function testAuction() external {
         vm.prank(USER);
         vulnerableAuction.bid{value: 1 ether}();
@@ -64,6 +65,7 @@ contract VulnerableAuctionTest is Test {
         assertEq(5 ether, address(USER).balance);
         assertEq(3 ether, address(USER2).balance);
     }
+
     function testDosAttack() external {
         vm.prank(USER);
         vulnerableAuction.bid{value: 1 ether}();
@@ -75,9 +77,7 @@ contract VulnerableAuctionTest is Test {
         assertEq(2 ether, vulnerableAuction.lastBid());
         assertEq(address(attackAuction), vulnerableAuction.lastGetter());
         vm.prank(USER);
-        vm.expectRevert(
-            VulnerableAuction.VulnerableAuction__PaymentUnsuccesfull.selector
-        );
+        vm.expectRevert(VulnerableAuction.VulnerableAuction__PaymentUnsuccesfull.selector);
         vulnerableAuction.bid{value: 3 ether}();
         assertEq(5 ether, USER.balance); //even if user deposit more money balance have to not change
         assertEq(2 ether, vulnerableAuction.lastBid());
@@ -103,10 +103,7 @@ contract VulnerableAuctionTest is Test {
         vulnerableAuctionFixed.bid{value: 3 ether}();
         assertEq(3 ether, vulnerableAuctionFixed.lastBid());
         assertEq(USER2, vulnerableAuctionFixed.lastGetter());
-        assertEq(
-            2 ether,
-            vulnerableAuctionFixed.pendingRefunds(address(attackAuction))
-        );
+        assertEq(2 ether, vulnerableAuctionFixed.pendingRefunds(address(attackAuction)));
         assertEq(6 ether, address(vulnerableAuctionFixed).balance);
 
         uint256 balanceBefore = USER.balance;
@@ -116,11 +113,7 @@ contract VulnerableAuctionTest is Test {
         assertEq(0, vulnerableAuctionFixed.pendingRefunds(USER));
 
         vm.prank(address(attackAuction));
-        vm.expectRevert(
-            VulnerableAuctionFixed
-                .VulnerableAuctionFixed__PaymentUnsuccesfull
-                .selector
-        );
+        vm.expectRevert(VulnerableAuctionFixed.VulnerableAuctionFixed__PaymentUnsuccesfull.selector);
         vulnerableAuctionFixed.withdraw();
     }
 }

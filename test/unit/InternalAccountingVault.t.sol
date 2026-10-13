@@ -18,12 +18,7 @@ contract InternalAccountingVaultTest is VaultTestBase {
         //A.USER share holders increase
         assertEq(FIRST_AMOUNT, internalAccountingVault.balanceOf(USER));
         //B.VAULT token increase
-        assertEq(
-            FIRST_AMOUNT,
-            internalAccountingVault.balanceOfVault(
-                address(internalAccountingVault)
-            )
-        );
+        assertEq(FIRST_AMOUNT, internalAccountingVault.balanceOfVault(address(internalAccountingVault)));
         //C.VAULT share holders increase
         assertEq(FIRST_AMOUNT, internalAccountingVault.totalShares());
     }
@@ -43,17 +38,13 @@ contract InternalAccountingVaultTest is VaultTestBase {
         //A.USER share holders equal 0
         assertEq(0, internalAccountingVault.balanceOf(USER));
         //B.VAULT token equal 0
-        assertEq(
-            0,
-            internalAccountingVault.balanceOfVault(
-                address(internalAccountingVault)
-            )
-        );
+        assertEq(0, internalAccountingVault.balanceOfVault(address(internalAccountingVault)));
         //C.VAULT share holders equal 0
         assertEq(0, internalAccountingVault.totalShares());
         //D.USER balance have to be same
         assertEq(STARTING_BALANCE, mockToken.balanceOf(USER));
     }
+
     function test_Partial_Withdraw_UpdatesAllStatesCorrectly() external {
         //arrange
         vm.startPrank(USER);
@@ -69,18 +60,10 @@ contract InternalAccountingVaultTest is VaultTestBase {
         //A.USER share holders
         assertEq(FIRST_AMOUNT / 2, internalAccountingVault.balanceOf(USER));
         //B.VAULT token
-        assertEq(
-            FIRST_AMOUNT / 2,
-            internalAccountingVault.balanceOfVault(
-                address(internalAccountingVault)
-            )
-        );
+        assertEq(FIRST_AMOUNT / 2, internalAccountingVault.balanceOfVault(address(internalAccountingVault)));
         //C.VAULT share holders
         assertEq(FIRST_AMOUNT / 2, internalAccountingVault.totalShares());
         //D.USER balance
-        assertEq(
-            STARTING_BALANCE - (FIRST_AMOUNT / 2),
-            mockToken.balanceOf(USER)
-        );
+        assertEq(STARTING_BALANCE - (FIRST_AMOUNT / 2), mockToken.balanceOf(USER));
     }
 }

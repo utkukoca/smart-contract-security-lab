@@ -21,9 +21,7 @@ contract DeadShareVault {
         //asset.transferFrom(msg.sender, address(this), _amount); chicken egg problem
     }
 
-    function deposit(
-        uint256 _amountToken
-    ) public returns (uint256 _shareAmount) {
+    function deposit(uint256 _amountToken) public returns (uint256 _shareAmount) {
         uint256 shares;
         if (_amountToken == 0) {
             revert DeadShareVault__ZeroAmount();
@@ -32,9 +30,7 @@ contract DeadShareVault {
                 balanceOf[msg.sender] = balanceOf[msg.sender] + _amountToken;
                 shares = _amountToken;
             } else {
-                shares =
-                    (_amountToken * totalShares) /
-                    asset.balanceOf(address(this));
+                shares = (_amountToken * totalShares) / asset.balanceOf(address(this));
                 balanceOf[msg.sender] += shares;
             }
         }
@@ -49,8 +45,7 @@ contract DeadShareVault {
             revert DeadShareVault__ZeroAmount();
         } else {
             if (_shareAmount <= balanceOf[msg.sender]) {
-                uint256 tokenWithdrawAmount = (_shareAmount *
-                    asset.balanceOf(address(this))) / totalShares;
+                uint256 tokenWithdrawAmount = (_shareAmount * asset.balanceOf(address(this))) / totalShares;
                 balanceOf[msg.sender] -= _shareAmount;
                 totalShares -= _shareAmount;
                 asset.transfer(msg.sender, tokenWithdrawAmount);

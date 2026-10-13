@@ -5,6 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 contract Attacker {
     VulnerableBank public vulnerableBank;
     address attackerWallet;
+
     constructor(VulnerableBank _bank, address _attackerWallet) {
         vulnerableBank = _bank;
         attackerWallet = _attackerWallet;
@@ -15,9 +16,10 @@ contract Attacker {
         vulnerableBank.withdraw();
         withdrawMoney(payable(attackerWallet));
     }
+
     function withdrawMoney(address payable _address) public payable {
         uint256 moneyInside = address(this).balance;
-        (bool success, ) = _address.call{value: moneyInside}("");
+        (bool success,) = _address.call{value: moneyInside}("");
         require(success, "not send");
     }
 
@@ -57,6 +59,6 @@ contract TestAttacker is Test {
         console.log(address(vulnerableBank).balance);
         console.log(address(ATTACKER).balance);
         assertEq(0, address(vulnerableBank).balance);
-        assertEq(11* 10**18, address(ATTACKER).balance);
+        assertEq(11 * 10 ** 18, address(ATTACKER).balance);
     }
 }

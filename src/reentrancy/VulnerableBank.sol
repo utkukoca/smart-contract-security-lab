@@ -11,10 +11,11 @@ contract VulnerableBank {
         if (msg.value == 0) revert VulnerableBank__DepositAmountIsZero();
         balanceOfUser[msg.sender] += msg.value;
     }
+
     function withdraw() public payable {
         uint256 balanceUser = balanceOfUser[msg.sender];
         if (balanceUser == 0) revert VulnerableBank__UserBalanceIsZero();
-        (bool success, ) = msg.sender.call{value: balanceUser}("");
+        (bool success,) = msg.sender.call{value: balanceUser}("");
         if (!success) {
             revert VulnerableBank__MoneyNotSend();
         }

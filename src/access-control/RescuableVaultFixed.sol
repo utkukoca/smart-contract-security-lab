@@ -13,10 +13,10 @@ contract RescuableVaultFixed is InternalAccountingVault {
     }
 
     function rescueTokens(address to) public {
-        if (msg.sender != OWNER) revert RescuableVaultFixed__NotOwner();
-        else {
-            uint256 rescueTokenAmount = asset.balanceOf(address(this)) -
-                balanceOfVault[address(this)];
+        if (msg.sender != OWNER) {
+            revert RescuableVaultFixed__NotOwner();
+        } else {
+            uint256 rescueTokenAmount = asset.balanceOf(address(this)) - balanceOfVault[address(this)];
             asset.transfer(to, rescueTokenAmount);
         }
     }

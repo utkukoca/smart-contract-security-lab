@@ -12,8 +12,7 @@ contract RescuableVault is InternalAccountingVault {
     }
 
     function rescueTokens(address to) public {
-        uint256 rescueTokenAmount = asset.balanceOf(address(this)) -
-            balanceOfVault[address(this)];
+        uint256 rescueTokenAmount = asset.balanceOf(address(this)) - balanceOfVault[address(this)];
         asset.transfer(to, rescueTokenAmount);
     }
 }

@@ -25,18 +25,12 @@ contract VaultInvariantTest is Test {
         for (uint256 i = 0; i < savers.length; i++) {
             mockToken.mint(savers[i], FIRST_AMOUNT * DECIMALS);
             vm.prank(savers[i]);
-            mockToken.approve(
-                address(internalAccountingVault),
-                type(uint256).max
-            );
+            mockToken.approve(address(internalAccountingVault), type(uint256).max);
         }
-        vaultHandler = new VaultHandler(
-            mockToken,
-            savers,
-            internalAccountingVault
-        );
+        vaultHandler = new VaultHandler(mockToken, savers, internalAccountingVault);
         targetContract(address(vaultHandler));
     }
+
     function invariant_totalSharesEqualsSumOfBalances() external {
         address[] memory actors = vaultHandler.getActors();
         uint256 totalBalance;

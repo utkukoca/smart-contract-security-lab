@@ -15,9 +15,7 @@ import {InternalAccountingVault} from "../../src/InternalAccountingVault.sol";
 contract InflationAttack is VaultTestBase {
     uint256 constant ATTACKER_SHARE_AMOUNT = 1000 * DECIMALS;
 
-    function test_attack_FirstDepositorStealsVictimDeposit_DeadShareVault()
-        external
-    {
+    function test_attack_FirstDepositorStealsVictimDeposit_DeadShareVault() external {
         vm.startPrank(ATTACKER);
         deadShareVault.deposit(ATTACKER_SHARE_AMOUNT);
         mockToken.transfer(address(deadShareVault), 900 * DECIMALS);
@@ -65,9 +63,7 @@ contract InflationAttack is VaultTestBase {
         assertEq(deadShareVault.balanceOf(USER), 0);
     }
 
-    function test_attack_FirstDepositorStealsVictimDeposit_InternalAccountingVault()
-        external
-    {
+    function test_attack_FirstDepositorStealsVictimDeposit_InternalAccountingVault() external {
         vm.startPrank(ATTACKER);
         internalAccountingVault.deposit(ATTACKER_SHARE_AMOUNT);
         mockToken.transfer(address(internalAccountingVault), 900 * DECIMALS);
@@ -94,10 +90,7 @@ contract InflationAttack is VaultTestBase {
     function test_InternalAccounting_ResistsMassiveDonation() external {
         vm.startPrank(ATTACKER);
         internalAccountingVault.deposit(ATTACKER_SHARE_AMOUNT);
-        mockToken.transfer(
-            address(internalAccountingVault),
-            1000000000 * DECIMALS
-        );
+        mockToken.transfer(address(internalAccountingVault), 1000000000 * DECIMALS);
         vm.stopPrank();
 
         vm.prank(USER);

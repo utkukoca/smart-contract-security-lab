@@ -3,6 +3,7 @@
 pragma solidity ^0.8.20;
 import {Test, console} from "forge-std/Test.sol";
 import {FeeOnTransferToken} from "../../src/fee-on-transfer/FeeOnTransferToken.sol";
+
 contract FeeOnTransferTokenTest is Test {
     FeeOnTransferToken feeOnTransferToken;
     uint256 DECIMALS = 10 ** 18;
@@ -14,6 +15,7 @@ contract FeeOnTransferTokenTest is Test {
         feeOnTransferToken = new FeeOnTransferToken(CREATOR);
         feeOnTransferToken.mint(USER1, 1000 * DECIMALS);
     }
+
     function testNoFeeOnMint() public {
         assertEq(feeOnTransferToken.balanceOf(USER1), 1000 * DECIMALS);
     }

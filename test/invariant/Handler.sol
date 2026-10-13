@@ -9,11 +9,7 @@ contract VaultHandler is Test {
     MockToken token;
     address[] actors; // önceden hazırlanmış kullanıcılar
 
-    constructor(
-        MockToken _token,
-        address[] memory _actors,
-        InternalAccountingVault _internalAccountingVault
-    ) {
+    constructor(MockToken _token, address[] memory _actors, InternalAccountingVault _internalAccountingVault) {
         token = _token;
         actors = _actors;
         internalAccountingVault = _internalAccountingVault;

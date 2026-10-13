@@ -13,8 +13,9 @@ contract VulnerableAuctionFixed {
 
     function bid() public payable {
         if (lastGetter == address(0)) {
-            if (msg.value == 0) revert VulnerableAuctionFixed__LowBidAmount();
-            else {
+            if (msg.value == 0) {
+                revert VulnerableAuctionFixed__LowBidAmount();
+            } else {
                 lastGetter = msg.sender;
                 lastBid = msg.value;
             }
@@ -26,7 +27,9 @@ contract VulnerableAuctionFixed {
                 pendingRefunds[lastGetter] += lastBid;
                 lastGetter = msg.sender;
                 lastBid = msg.value;
-            } else revert VulnerableAuctionFixed__LowBidAmount();
+            } else {
+                revert VulnerableAuctionFixed__LowBidAmount();
+            }
         }
     }
 
@@ -34,7 +37,7 @@ contract VulnerableAuctionFixed {
         uint256 amount = pendingRefunds[msg.sender];
         if (amount == 0) revert VulnerableAuctionFixed__NotTrueDebtAddress();
         pendingRefunds[msg.sender] = 0;
-        (bool success, ) = msg.sender.call{value: amount}("");
+        (bool success,) = msg.sender.call{value: amount}("");
         if (!success) revert VulnerableAuctionFixed__PaymentUnsuccesfull();
     }
 }

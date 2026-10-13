@@ -1,0 +1,1 @@
+- Never read, print, create, or modify .env files, API keys, or private keys.

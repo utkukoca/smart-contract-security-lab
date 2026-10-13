@@ -10,22 +10,25 @@ contract VulnerableAuction {
 
     function bid() public payable {
         if (lastGetter == address(0)) {
-            if (msg.value == 0) revert VulnerableAuction__LowBidAmount();
-            else {
+            if (msg.value == 0) {
+                revert VulnerableAuction__LowBidAmount();
+            } else {
                 lastGetter = msg.sender;
                 lastBid = msg.value;
             }
         } else {
             if (msg.value > lastBid) {
-                //if state-change action 
+                //if state-change action
                 //CEI
                 address oldGetter = lastGetter;
                 uint256 oldBid = lastBid;
                 lastGetter = msg.sender;
                 lastBid = msg.value;
-                (bool success, ) = oldGetter.call{value: oldBid}(""); //if there are not receive or fallback automaticly revert
+                (bool success,) = oldGetter.call{value: oldBid}(""); //if there are not receive or fallback automaticly revert
                 if (!success) revert VulnerableAuction__PaymentUnsuccesfull();
-            } else revert VulnerableAuction__LowBidAmount();
+            } else {
+                revert VulnerableAuction__LowBidAmount();
+            }
         }
     }
 }
